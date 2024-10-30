@@ -99,7 +99,12 @@
                                     <br>
                                     <input type="radio" name="vote{{$bill_data->id}}" value="2" url="{{route('billVote')}}" id="Against{{$bill_data->id}}" rid="{{base64_encode($bill_data->id)}}" user_id="{{Auth::user()->id}}" class="vote_radio"> <label for="Against{{$bill_data->id}}">Against</label>
                                     @else
-                                    Voted! <b>({{$bill_data->status == 1?'Abstaint':'Against'}})</b>
+                                    @php
+                                        $voted = App\Models\votes::where('bill_id', $bill_data->id)->where('user_id',Auth::user()->id)->first();
+                                        
+                                    @endphp
+                                    
+                                    Voted! <b>(@if($voted->vote == 1) Abstaint @else Against @endif)</b>
                                     @endif
                                 @endif
                             </td>
@@ -115,7 +120,7 @@
                                 <p class="text-danger">Against (<b>{{$Against_votes_count}}</b>)</p>
                             </td>
                             @endif
-                            @if(Auth::user()->role_id == 2)
+                            @if(Auth::user()->role_id >= 2)
                             <td>
                             @php
                                         

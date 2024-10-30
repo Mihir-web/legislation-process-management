@@ -90,7 +90,7 @@ $('.vote_radio').on('change', function(){
     }
     swal({
         title: "Your vote is '"+vote_status+"'",
-        text: "Want to delete this record",
+        text: "Want to submit this vote",
         icon: "warning",
         buttons: ["Cancel", "Submit"],
         dangerMode: true,

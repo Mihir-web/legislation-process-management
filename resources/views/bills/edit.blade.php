@@ -11,7 +11,7 @@
                 <div class="col-lg-12">
                     <div class="p-lg-5 p-4">
                         <div class="text-center">
-                            <h1 class="h4 text-gray-900 mb-4">Edit Inventory</h1>
+                            <h1 class="h4 text-gray-900 mb-4">Edit Bills</h1>
                         </div>
                         @if ($errors->any())
                             <div class="alert alert-danger">
