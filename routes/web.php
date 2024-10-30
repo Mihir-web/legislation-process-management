@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BillsController;
+use App\Http\Controllers\NotificationController;
 
 
 /*
@@ -45,18 +46,23 @@ Route::group(['middleware' => 'is_reviewer'], function () {
         Route::post('/bills/update',[BillsController::class, 'update'])->name('billUpdate');
         Route::post('/bills/delete',[BillsController::class, 'delete'])->name('billDelete');
         Route::post('/bills/statusChange',[BillsController::class, 'statuschange'])->name('billStatusChange');
+        Route::post('/bills/voting',[BillsController::class, 'voting'])->name('billVote');
+        Route::post('/notifications/delete',[NotificationController::class, 'delete'])->name('notificationDelete');
+
+
+        Route::post('/bills/writecomment',[BillsController::class, 'makeComment'])->name('billWriteComment');
+        Route::get('/bills/getcomment', [BillsController::class, 'getComment'])->name('billGetComment');
+        Route::post('/bills/deletecomment',[BillsController::class, 'deleteComment'])->name('billDeleteComment');
+
+
         Route::group(['middleware' => 'is_superadmin'], function () {
-            // bills
-            
+            // reports
+            Route::get('/reports',[BillsController::class, 'reports'])->name('reports');
+            Route::get('/bills/export', [BillsController::class, 'export'])->name('billreportsexport');
            
 });
 
 
-// Contact Us Leads
-Route::get('/contactLeads',[ContactLeadsController::class, 'index'])->name('adminContactLeads');
-Route::post('/contactLeads/delete',[ContactLeadsController::class, 'delete'])->name('adminContactLeadsDelete');
-Route::post('/contactLeads/statusChange',[ContactLeadsController::class, 'statuschange'])->name('adminContactLeadStatusChange');
-Route::get('/contactLeads/export', [ContactLeadsController::class, 'export'])->name('adminContactLeadsexport');
 });
 });
 });

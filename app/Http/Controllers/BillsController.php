@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\bills;
 use App\Models\user;
+use App\Models\votes;
 use App\Models\notifications;
+use App\Models\amendments;
 use App\Http\Requests\AddBillRequest;
 use App\Http\Requests\UpdateBillRequest;
+use Illuminate\Support\Facades\Auth;
+use Excel;
+use App\Exports\BillReportExport;
 
 use Session;
 use Illuminate\Support\Facades\Storage;
@@ -101,12 +106,33 @@ class BillsController extends Controller
                        
                         foreach($mps as $mp_data){
                             $notification['user_id'] =  $mp_data->id;
-                            $notification['message'] =  "Voting session startedd for the bill."; 
+                            $notification['message'] =  "Voting session started for the bill '".$record->title."'."; 
                             notifications::create($notification);
                         }   
                     }
                     
                 
+                return 'success';
+            }
+            return 'Record not found';
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+    }
+
+    public function voting(Request $request)
+    {
+        try{
+            $inputs = $request->all();
+
+            $vote['bill_id'] = base64_decode($inputs['bill_id']);
+            $vote['user_id'] = $inputs['user_id'];
+            $vote['vote'] = $inputs['vote'];
+            
+           
+            $record = votes::create($vote);
+            
+            if(!empty($record)){
                 return 'success';
             }
             return 'Record not found';
@@ -135,5 +161,57 @@ class BillsController extends Controller
         }catch(\Exception $e){
             return $e->getMessage();
         }
+    }
+
+
+    public function makeComment(Request $request){
+        if ($request->ajax()){
+          
+           
+            $comment = new amendments;
+
+            $comment->user_id = Auth::user()->id;
+            $comment->bill_id = $request->bill_id;
+            
+            $comment->comment = $request->commenttext;
+           
+            $comment->save();
+            $all_comments = amendments::with('user')->where('bill_id', '=', $request->bill_id)->get();
+            $count = "(".count($all_comments).")";
+            return response($count);
+        }
+    }
+
+    public function getComment(Request $request){
+        if ($request->ajax()){
+         
+            
+           $comments = amendments::where('bill_id', '=', $request->bill_id)->get();
+
+
+     
+           return view('commentlist', compact('comments'));
+       }
+   }
+
+    
+   public function reports(Request $request)
+   {
+       $filter = $request->all();
+       $bills = bills::orderBy('created_at','asc')->get();
+       $bills_total = bills::count();
+       $under_review_count = bills::where('status',2)->count();
+       $voting_ongoing = bills::where('status', 5)->count();
+       $approved = bills::where('status', 3)->count();
+       $rejected = bills::where('status', 4)->count();
+
+       
+
+       return view('bills.report',compact('bills','bills_total','filter','under_review_count','voting_ongoing','approved','rejected'));
+   }
+
+   public function export(Request $request)
+    {
+        return Excel::download(new BillReportExport($request->all()), 'Bills_report.xlsx');
     }
 }

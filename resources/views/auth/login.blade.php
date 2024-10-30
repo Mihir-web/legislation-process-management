@@ -92,6 +92,10 @@
                                             <input type="checkbox" class="form-check-input" id="showhide" value="" >Show Password
                                           </label>
                                         </div>
+                                        <div>
+        <input type="checkbox" name="remember" id="remember">
+        <label for="remember">Remember Me</label>
+    </div>
                                         <button type="submit" class="btn btn-primary">
                                     {{ __('Login') }}
                                 </button>
